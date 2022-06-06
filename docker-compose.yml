@@ -1,0 +1,40 @@
+version: "3.3"
+services:
+  postgresql:
+    image: postgres:9.6
+    container_name: mypostgresql1
+    ports:
+      - "5433:5432"
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgress
+    tmpfs:
+      - /tmp
+      - /run/postgresql
+    volumes:
+      - ./docker_data/postgresql/data:/var/lib/postgresql/data/pgdata
+      #- ./docker_build/postgresql/init.d:/docker-entrypoint-initdb.d
+      - ./dbschema.sql:/docker-entrypoint-initdb.d/dbschema.sql
+    restart: always
+    networks:
+      test_network:
+         ipv4_address: 176.21.2.2
+  redis:
+     image: redis:3.2
+     container_name: myredis1
+     ports:
+       - "6382:6379"
+     volumes:
+       - ./docker_data/redis/data:/data
+     restart: always
+     command: redis-server
+     networks:
+      test_network:
+         ipv4_address: 176.21.2.1
+networks:
+  test_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 176.21.2.0/16
