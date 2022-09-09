@@ -32,6 +32,21 @@ services:
      networks:
       test_network:
          ipv4_address: 176.21.2.1
+  jenkins:
+    image: jenkins/jenkins:lts
+    restart: unless-stopped
+    privileged: true
+    user: root
+    ports:
+      - 8080:8080
+      - 50000:50000
+    container_name: jenkins
+    volumes:
+      - ./docker_data/jenkins:/var/jenkins_home
+      - ./docker_data/docker.sock:/var/run/docker.sock
+    networks:
+      test_network:
+        ipv4_address: 176.21.2.3
 networks:
   test_network:
     driver: bridge
