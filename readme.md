@@ -23,3 +23,8 @@ DB name: <code>testdemo</code><br/>
 username <code>postgres</code><br/>
 password: <code>postgress</code>
 
+To run fetch date from cosumer use:
+<code>sudo docker exec --interactive --tty broker \
+kafka-console-consumer --bootstrap-server broker:9092 \
+--topic firstTime \
+--from-beginning</code>
