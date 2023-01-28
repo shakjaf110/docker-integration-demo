@@ -18,21 +18,27 @@ public class KafkaConsumer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
 
+    //consumer on return all partition wise in topic, no load balancer will implement here as partitionOffsets is set
     @KafkaListener(topicPartitions = @TopicPartition(topic = AppConstants.TOPIC_NAME, partitionOffsets = {
             @PartitionOffset(partition = "0", initialOffset = "5"),
             @PartitionOffset(partition = "1", initialOffset = "0"),
             @PartitionOffset(partition = "2", initialOffset = "0"),
             @PartitionOffset(partition = "3", initialOffset = "0"),
             @PartitionOffset(partition = "4", initialOffset = "0"),
+
     }))
     public void listen(@Payload String foo, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
-        System.out.println("Received: " + foo + " (partition: " + partition + ")");
+        System.out.println("1. Received: " + foo + " (partition: " + partition + ")");
     }
 
-    @KafkaListener(topics = AppConstants.TOPIC_NAME,
-            groupId = AppConstants.GROUP_ID)
-    public void consume(String message){
-        LOGGER.info(String.format("Message received -> %s", message));
+    //consumer on return all partition wise in topic. load balancer implemented by group id since next 2 listener have group id, will be balance the message
+    @KafkaListener(topics = AppConstants.TOPIC_NAME,groupId = AppConstants.GROUP_ID)
+    public void consume1(@Payload String foo, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition){
+        System.out.println("2. Received: " + foo + " (partition: " + partition + ")");
+    }
+    @KafkaListener(topics = AppConstants.TOPIC_NAME,groupId = AppConstants.GROUP_ID)
+    public void consume2(@Payload String foo, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition){
+        System.out.println("3. Received: " + foo + " (partition: " + partition + ")");
     }
 
 }
