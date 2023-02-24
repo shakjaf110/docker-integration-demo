@@ -1,4 +1,4 @@
-package com.example.demo.kafka;
+package com.example.demo.config;
 
 import com.example.demo.AppConstants;
 import org.apache.kafka.clients.admin.NewTopic;
