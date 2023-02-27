@@ -7,12 +7,14 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 open class SecurityConfig(
     private val userDetailsService: UserDetailsService,
 ) {
@@ -33,8 +35,7 @@ open class SecurityConfig(
         val authenticationManager = authManager(http)
         // Put your endpoint to create/sign, otherwise spring will secure it as
         // well you won't be able to do any request
-        http.authorizeRequests().antMatchers("/users")
-            .permitAll().antMatchers("/kotlin/**").hasAnyAuthority("admin")
+        http.authorizeRequests().antMatchers("/users").permitAll()
             .anyRequest().authenticated().and()
             .csrf().disable()
             .authenticationManager(authenticationManager)

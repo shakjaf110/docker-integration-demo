@@ -5,6 +5,7 @@ import com.example.demo.service.KotlinTestService
 import com.example.demo.service.TestService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -12,13 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping
 
 @Controller
 @RequestMapping("/kotlin")
-class KotlinTestController(
+@PreAuthorize("hasAuthority('admin')")
+open class KotlinTestController(
     val kotlinTestService: KotlinTestService,
     val testService: TestService
-) {
+)  {
 
     @GetMapping("/test/all")
-    fun getCall():ResponseEntity<List<Test>> {
+    open fun getCall():ResponseEntity<List<Test>> {
         val tests=testService?.findAll()
         val testResponseEntity= ResponseEntity<List<Test>>(tests,HttpStatus.FOUND);
         return testResponseEntity;

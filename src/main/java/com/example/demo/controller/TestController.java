@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/rest")
-public class TestController extends ParentController {
+public class TestController{
 
     @Autowired
     TestService testService;
