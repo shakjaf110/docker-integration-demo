@@ -1,22 +1,32 @@
 package com.example.demo.kafka;
 
 import com.example.demo.AppConstants;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
+import org.springframework.util.concurrent.ListenableFuture;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
-public class KafkaProducer {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaProducer.class);
+@Slf4j
+public class KafkaProducer<T> {
 
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private KafkaTemplate<String, KafkaMessage<T>> kafkaTemplate;
 
-    public void sendMessage(String message){
-        LOGGER.info(String.format("Message sent %s", message));
-        kafkaTemplate.send(AppConstants.TOPIC_NAME,message);
+    public ListenableFuture<SendResult<String, KafkaMessage<T>>> produce(final String key, final KafkaMessage<T> data) {
+        log.info(String.format("Message sent, key: %s", key));
+        return kafkaTemplate.send(AppConstants.TOPIC_NAME,null, key, data);
     }
 }
