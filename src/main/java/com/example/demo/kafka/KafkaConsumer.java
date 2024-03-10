@@ -1,7 +1,9 @@
 package com.example.demo.kafka;
 
 import com.example.demo.AppConstants;
+import com.example.demo.domain.Test;
 import com.example.demo.exceptions.CustomException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.slf4j.Logger;
@@ -14,12 +16,12 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 @Service
+@Slf4j
 public class KafkaConsumer {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(KafkaConsumer.class);
 
     //consumer on return all partition wise in topic, no load balancer will implement here as partitionOffsets is set
    /* @KafkaListener(topicPartitions = @TopicPartition(topic = AppConstants.TOPIC_NAME, partitionOffsets = {
@@ -34,16 +36,14 @@ public class KafkaConsumer {
         System.out.println("1. Received: " + foo + " (partition: " + partition + ")");
     }*/
 
-    //consumer on return all partition wise in topic. load balancer implemented by group id since next 2 listener have group id, will be balance the message
-    @KafkaListener(topics = AppConstants.TOPIC_NAME,groupId = AppConstants.GROUP_ID)
-    public void consume1(@Payload String foo, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition, Acknowledgment acknowledgment){
-        System.out.println("2. Received: " + foo + " (partition: " + partition + ")");
-        acknowledgment.nack(500);
-    }
-    @KafkaListener(topics = AppConstants.TOPIC_NAME,groupId = AppConstants.GROUP_ID)
-    public void consume2(ConsumerRecord<?, ?> consumerRecord, @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition, Acknowledgment acknowledgment){
-        System.out.println("3. Received: " + consumerRecord.value() + " (partition: " + partition + ", offset: "+consumerRecord.offset()+")");
-        acknowledgment.acknowledge();
+    @KafkaListener(topics = AppConstants.TOPIC_NAME, groupId = AppConstants.GROUP_ID, containerFactory = "kafkaListenerContainerFactory")
+    public <T> void consume(ConsumerRecord<String, KafkaMessage<T>> consumerRecord) {
+        log.info("ConsumerRecord, Topic: {}, offset: {}, key: {} ", consumerRecord.topic(), consumerRecord.offset(), consumerRecord.key());
+        try {
+            List<Test> tests =  consumerRecord.value().convertListTo(Test.class);
+        } catch (Exception e) {
+            log.error("An error occurred for topic: {}, key: {}: {}", consumerRecord.topic(), consumerRecord.key(), e.getMessage());
+        }
     }
 
 }
