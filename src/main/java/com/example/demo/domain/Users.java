@@ -1,5 +1,7 @@
 package com.example.demo.domain;
 
+import lombok.*;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -48,6 +50,10 @@ public class Users {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getRole() {
         return role;
     }
@@ -55,10 +61,4 @@ public class Users {
     public void setRole(String role) {
         this.role = role;
     }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-
 }

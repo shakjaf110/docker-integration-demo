@@ -18,7 +18,7 @@ Run the following command to down all docker containera:<br>
   you will able to access app on port <code>8080</code>, access <code>http://localhost:8080/rest/test</code> on your browser.
 
 <h3>Connect to postgres</h3>
-IP: <code>176.21.2.2:5432</code><br/>
+IP: <code>localhost:5434</code><br/>
 DB name: <code>testdemo</code><br/>
 username <code>postgres</code><br/>
 password: <code>postgress</code>
