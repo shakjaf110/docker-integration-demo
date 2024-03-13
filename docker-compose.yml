@@ -1,38 +1,35 @@
 version: "3.3"
 services:
-  postgresql:
-    image: postgres:9.6
-    container_name: mypostgresql1
+  postgresql-demo:
+    image: postgres:latest
+    container_name: postgresql-demo
     ports:
-      - "5433:5432"
+      - "5434:5432"
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgress
+      POSTGRES_PASSWORD: postgres
     tmpfs:
       - /tmp
       - /run/postgresql
     volumes:
-      - ./docker_data/postgresql/data:/var/lib/postgresql/data/pgdata
       #- ./docker_build/postgresql/init.d:/docker-entrypoint-initdb.d
       - ./dbschema.sql:/docker-entrypoint-initdb.d/dbschema.sql
     restart: always
     networks:
-      test_network:
-         ipv4_address: 176.21.2.2
-  redis:
-     image: redis:3.2
-     container_name: myredis1
-     ports:
-       - "6382:6379"
-     volumes:
-       - ./docker_data/redis/data:/data
-     restart: always
-     command: redis-server
-     networks:
-      test_network:
-         ipv4_address: 176.21.2.1
-  jenkins:
+      - test_network
+  redis-demo:
+    image: redis:3.2
+    container_name: redis-demo
+    ports:
+      - "6382:6379"
+    volumes:
+      - ./docker_data/redis/data:/data
+    restart: always
+    command: redis-server
+    networks:
+      - test_network
+  jenkins-demo:
     image: jenkins/jenkins:lts
     restart: unless-stopped
     privileged: true
@@ -40,43 +37,40 @@ services:
     ports:
       - 8080:8080
       - 50000:50000
-    container_name: jenkins
+    container_name: jenkins-demo
     volumes:
       - ./docker_data/jenkins:/var/jenkins_home
       - ./docker_data/docker.sock:/var/run/docker.sock
     networks:
-      test_network:
-        ipv4_address: 176.21.2.3
-  zookeeper:
+    - test_network
+  zookeeper-demo:
     image: confluentinc/cp-zookeeper:7.3.0
-    container_name: zookeeper
+    container_name: zookeeper-demo
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
-      test_network:
-        ipv4_address: 176.21.2.4
-  broker:
+      - test_network
+  kafka-demo:
     image: confluentinc/cp-kafka:7.3.0
-    container_name: broker
+    container_name: kafka-demo
     ports:
       - "9092:9092"
     depends_on:
-      - zookeeper
+      - zookeeper-demo
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://176.21.2.5:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-demo:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_LOG_DIRS: "/var/lib/kafka/data"
+    volumes:
+      - demo-kafka-data:/var/lib/kafka/data
     networks:
-      test_network:
-        ipv4_address: 176.21.2.5
+      - test_network
+volumes:
+  demo-kafka-data:
+    driver: local
 networks:
   test_network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 176.21.2.0/16

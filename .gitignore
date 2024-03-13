@@ -1,2 +1,4 @@
-docker_data
-target
+docker_data/
+target/
+.idea/
+.mvn/
