@@ -1,18 +1,10 @@
 package com.example.demo.kafka;
 
 import com.example.demo.AppConstants;
-import com.example.demo.domain.Test;
-import com.example.demo.exceptions.CustomException;
+import com.example.demo.domain.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.support.Acknowledgment;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
@@ -40,7 +32,7 @@ public class KafkaConsumer {
     public <T> void consume(ConsumerRecord<String, KafkaMessage<T>> consumerRecord) {
         log.info("ConsumerRecord, Topic: {}, offset: {}, key: {} ", consumerRecord.topic(), consumerRecord.offset(), consumerRecord.key());
         try {
-            List<Test> tests =  consumerRecord.value().convertListTo(Test.class);
+            List<Transaction> tests =  consumerRecord.value().convertListTo(Transaction.class);
         } catch (Exception e) {
             log.error("An error occurred for topic: {}, key: {}: {}", consumerRecord.topic(), consumerRecord.key(), e.getMessage());
         }
