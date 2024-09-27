@@ -1,3 +1,5 @@
 target/
 docker_data/
-.idea/
+.idea
+/demo.iml
+/.idea/
