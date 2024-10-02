@@ -19,8 +19,14 @@ public class TestController{
     @Autowired
     TestService testService;
     @GetMapping(value = "/test")
-    public ResponseEntity<List<Test>> getCall(){
+    public ResponseEntity<List<Test>> get_call(){
         List<Test> tests=testService.findAll();
+        int x=0;
+        if (x == 0) {
+            x++;
+        } else if (x == 1) {
+            x++;
+        }
         ResponseEntity<List<Test>> testResponseEntity;
         testResponseEntity= new ResponseEntity<>(tests,HttpStatus.FOUND);
         return testResponseEntity;
